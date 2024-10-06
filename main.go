@@ -12,13 +12,12 @@ func timeUpdater() chan string {
 
 	c := make(chan string)
 
-	updateTime := func() { c <- time.Now().Format(timeFormat) }
+	update := func() { c <- time.Now().Format(timeFormat) }
 
 	go func() {
-		updateTime()
-		for range newTickerTimer(time.Second) {
-			updateTime()
+		update()
 		for range newTickerTimer(time.Minute) {
+			update()
 		}
 	}()
 
@@ -28,7 +27,7 @@ func timeUpdater() chan string {
 func bedTimeUpdater() chan string {
 	c := make(chan string)
 
-	updateBedTime := func() {
+	update := func() {
 		now := time.Now()
 		bedTime := time.Date(now.Year(), now.Month(), now.Day(), 22, 30, 0, 0, time.Local)
 
@@ -40,10 +39,9 @@ func bedTimeUpdater() chan string {
 	}
 
 	go func() {
-		updateBedTime()
+		update()
 		for range newTickerTimer(time.Minute) {
-		for range newTickerTimer(time.Second) {
-			updateBedTime()
+			update()
 		}
 	}()
 
