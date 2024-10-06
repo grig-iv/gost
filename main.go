@@ -18,6 +18,7 @@ func timeUpdater() chan string {
 		updateTime()
 		for range newTickerTimer(time.Second) {
 			updateTime()
+		for range newTickerTimer(time.Minute) {
 		}
 	}()
 
@@ -40,6 +41,7 @@ func bedTimeUpdater() chan string {
 
 	go func() {
 		updateBedTime()
+		for range newTickerTimer(time.Minute) {
 		for range newTickerTimer(time.Second) {
 			updateBedTime()
 		}
