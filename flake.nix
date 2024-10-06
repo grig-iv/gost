@@ -19,6 +19,7 @@
           name = "GOST";
           src = ./.;
           goPackagePath = "github.com/grig-iv/gost";
+          meta.mainProgram = "gost";
         };
       }
     );
