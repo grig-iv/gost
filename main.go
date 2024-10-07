@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"os/exec"
 	"time"
 )
@@ -56,6 +57,8 @@ func main() {
 
 	cache := make(map[updater]string)
 
+	var status bytes.Buffer
+
 	for {
 		select {
 		case x := <-updaters[0]:
@@ -64,20 +67,21 @@ func main() {
 			cache[updaters[1]] = x
 		}
 
-		status := ""
 		for _, c := range updaters {
 			block := cache[c]
 			if block == "" {
 				continue
 			}
 
-			if status != "" {
-				status += " | "
+			if status.Len() != 0 {
+				status.WriteString(" | ")
 			}
 
-			status += block
+			status.WriteString(block)
 		}
 
-		exec.Command("xsetroot", "-name", status).Run()
+		exec.Command("xsetroot", "-name", status.String()).Run()
+
+		status.Reset()
 	}
 }
