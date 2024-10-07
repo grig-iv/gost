@@ -49,9 +49,33 @@ func bedTimeUpdater() chan string {
 	return c
 }
 
+func xkblayoutUpdater() chan string {
+	c := make(chan string)
+
+	update := func() {
+		out, err := exec.Command("xkb-switch").Output()
+		if err != nil {
+			return
+		}
+
+		layout := string(out[:len(out)-1])
+		c <- layout
+	}
+
+	go func() {
+		update()
+		for range newTickerTimer(time.Millisecond * 500) {
+			update()
+		}
+	}()
+
+	return c
+}
+
 func main() {
 	updaters := [...]updater{
 		bedTimeUpdater(),
+		xkblayoutUpdater(),
 		timeUpdater(),
 	}
 
@@ -65,6 +89,8 @@ func main() {
 			cache[updaters[0]] = x
 		case x := <-updaters[1]:
 			cache[updaters[1]] = x
+		case x := <-updaters[2]:
+			cache[updaters[2]] = x
 		}
 
 		for _, c := range updaters {
